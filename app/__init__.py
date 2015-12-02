@@ -9,7 +9,6 @@ from flask.ext.bcrypt import Bcrypt
 app = Flask(__name__)
 app.config.from_object('config')
 
-
 # Mongo
 read_preference = read_preferences.ReadPreference.PRIMARY
 db = connect(db=config.MONGODB_DB, host=config.MONGODB_HOST, port=config.MONGODB_PORT, read_preference=read_preference)
@@ -22,4 +21,4 @@ lm.init_app(app)
 bcrypt = Bcrypt(app)
 
 # Import was placed here to stop circular imports.
-from app import views, models, api
+from app import models, api

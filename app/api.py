@@ -1,30 +1,28 @@
-from flask import send_file, jsonify, make_response, request, session
+from flask import send_file, jsonify, make_response, request, session, render_template
 from flask.ext.login import login_user, logout_user, current_user, login_required
-from app import app, bcrypt
+from app import app, bcrypt, lm
 from models import *
 from mongoengine.errors import *
 from bson.objectid import ObjectId
+import json
+from werkzeug.exceptions import *
 from scraper.core import parse
+from matt_code.core import compile_schedules
+# from app import app, db, lm
 
 
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#
-#     form = LoginForm()
-#     if form.validate_on_submit():
-#         user = User.objects(username=form.username.data).first()
-#         if user:
-#             if form.password.data in user.password:
-#                 user.authenticated = True
-#                 user.save()
-#                 login_user(user)
-#             # session['remember_me'] = form.remember_me.data
-#             # flash('Login requested for Username="%s", remember_me=%s' %
-#             #       (form.username.data, str(form.remember_me.data)))
-#                 return redirect(url_for('index'))
-#     return render_template('login.html',
-#                            title='Sign In',
-#                            form=form)
+@lm.user_loader
+def load_user(id):
+    user = User.objects(pk=id).first()
+    if user:
+        return user
+    else:
+        return None
+
+
+@app.route('/', methods=['GET'])
+def default():
+    return render_template('index.html')
 
 
 @app.route('/api/username', methods=['POST'])
@@ -37,7 +35,7 @@ def check_username():
                         'status': 'failed',
                         'action': 'username_check'})
     if user:
-        return jsonify({'status': 'complete',
+        return jsonify({'status': 'success',
                         'action': 'username_check'})
     else:
         return jsonify({'status': 'none',
@@ -48,11 +46,14 @@ def check_username():
 def who_am_i():
     try:
         user = current_user
+        session['gen_id'] = None
         return jsonify({'user': user.username,
-                        'action': 'who_am_i'})
+                        'action': 'who_am_i',
+                        'status': 'success'})
     except AttributeError:
         return jsonify({'user': 'anonymous',
-                        'action': 'who_am_i'})
+                        'action': 'who_am_i',
+                        'status': 'success'})
 
 
 @app.route('/api/login', methods=['POST'])
@@ -65,7 +66,7 @@ def check_password():
 
     if bcrypt.check_password_hash(user.password, request.form['password']):
         login_user(user)
-        return jsonify({'status': 'complete',
+        return jsonify({'status': 'success',
                         'action': 'login'})
     else:
         return jsonify({'status': 'failed',
@@ -86,7 +87,7 @@ def register_user():
 
     if user.save():
         login_user(user)
-        return jsonify({'status': 'complete',
+        return jsonify({'status': 'success',
                         'action': 'register_user'})
     else:
         return jsonify({'status': 'failed',
@@ -97,7 +98,7 @@ def register_user():
 @login_required
 def logout():
     logout_user()
-    return jsonify({'status': 'complete',
+    return jsonify({'status': 'success',
                     'action': 'logout'})
 
 
@@ -116,7 +117,7 @@ def delete_user():
 
     logout_user()
     if user.delete():
-        return jsonify({'status': 'complete',
+        return jsonify({'status': 'success',
                         'action': 'delete_user'})
     else:
         return jsonify({'status': 'failed',
@@ -124,22 +125,46 @@ def delete_user():
 
 
 @app.route('/api/generate', methods=['POST', 'GET'])
+# @login_required
 def generate():
-    # Check status of schedule generation.
-    if request.method == 'GET':
-        # gen_id = session.get('gen_id')
-        # schedule_object = Schedule.objects(pk=gen_id).first()
+    if current_user:
 
-        # return jsonify({'status': schedule_object.status,
-        #                 'name': schedule_object.name})
-        return jsonify({'test': 'true'})
-    elif request.method == 'POST':
+        # Check status of schedule generation.
+        if request.method == 'GET':
+            try:
+                gen_id = session.get('gen_id')
+                if gen_id:
+                    gen_object = Generator.objects(pk=gen_id).first()
+                    return jsonify({'status': gen_object.status})
+                else:
+                    return jsonify({'test': 'false'})
+            # schedule_object = Schedule.objects(pk=gen_id).first()
 
-        # schedule_object = Schedule().save()
-        # session['gen_id'] = schedule_object.id
-        parse.delay([['MATH', '3330'],
-                     ['CSE', '1301']])
-        return jsonify({'status': 'started'})
+            # return jsonify({'status': schedule_object.status,
+            #                 'name': schedule_object.name})
+            except Exception as e:
+                print e
+                raise BadRequest
+
+        elif request.method == 'POST':
+            # print request.data
+            if session.get('gen_id'):
+                gen_object = Generator.objects(pk=session['gen_id']).first()
+                if gen_object.status['fetch'] != 'complete' or gen_object.status['compile'] != 'complete':
+                    return jsonify({'status': 'aborted'})
+            try:
+                loaded_data = json.loads(request.data)
+                gen_object = Generator(owner=current_user.id, classes=loaded_data['classes'],
+                                       status={'fetch': 'started', 'compile': 'waiting'},
+                                       block_outs=loaded_data['block_outs']).save()
+                session['gen_id'] = str(gen_object.id)
+                parse(gen_object.id)
+                compile_schedules(loaded_data, gen_object.id)
+                return jsonify({'status': 'started'})
+            except Exception as e:
+                print e
+                raise BadRequest
+                # schedule_object = Schedule().save()
 
     else:
         print(request.method)

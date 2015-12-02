@@ -15,8 +15,12 @@ class User(Document):
     schedules = ListField(ReferenceField(Document))
 
     @property
+    def is_valid(self):
+        return True
+
+    @property
     def is_authenticated(self):
-        return self.authenticated
+        return True
 
     @property
     def is_active(self):
@@ -65,18 +69,25 @@ class Section(Document):
     meta = {'collection': 'sections'}
     class_number = StringField()
     department = StringField()
-    section_number = StringField()
+    section_number = StringField(unique=True)
     room = StringField()
     instructor = StringField()
     unformatted_day_time = StringField()
     start_time = DictField()
     end_time = DictField()
+    repetition = DictField()
+    uuid = UUIDField()
 
 
 class Generator(Document):
     meta = {'collection': 'generators'}
     owner = ObjectIdField()
-    started = IntField()
-    ended = IntField()
+    classes = ListField(DictField())
     tag_uuid = UUIDField()
-    sections = ListField(ReferenceField(Document))
+    sections = ListField(DictField())
+    block_outs = ListField(DictField())
+    status = DictField()
+    error = StringField()
+
+    def fetch_sections(self):
+        pass

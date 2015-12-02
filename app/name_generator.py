@@ -1,4 +1,4 @@
-import random, math
+import random
 
 left = [
     "admiring",
@@ -466,6 +466,6 @@ right = [
 
 def gen_name():
     pick = random.random()
-    name = "{0}_{1}".format(left[int(random.random() * len(left))], right[int(random.random() * len(
-        right))])
+    name = "{0} {1}".format(str(left[int(random.random() * len(left))]).capitalize(),
+                            str(right[int(random.random() * len(right))]).capitalize())
     return name

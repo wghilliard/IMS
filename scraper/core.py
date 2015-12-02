@@ -1,36 +1,53 @@
 from selenium import webdriver
 from bs4 import BeautifulSoup
 from time import sleep
-from models import Section
+from models import Section, Generator
 import datetime
 import re
 from selenium.common.exceptions import NoSuchFrameException
 from uuid import uuid4
 from __init__ import worker
-driver = webdriver.Firefox()
 
 
 @worker.task(name='tasks.parse')
-def parse(class_list):
+def parse(gen_id):
+    gen_object = Generator.objects(pk=gen_id).first()
     section_list = list()
-    print class_list
-
+    class_list = gen_object.classes
+    # print class_list
+    # return
     for thing in class_list:
-        print thing[0]
-        print thing[1]
-        section_list.append(scrape(thing[0], thing[1], uuid4()))
-
+        # print thing['name']
+        # print thing['number']
+        section_objects = Section.objects(class_number=thing['number'], department=thing['name'])
+        print section_objects
+        if section_objects:
+            section_list.append({thing['name'] + "_" + thing['number']: [section.id for section in section_objects]})
+        else:
+            section_list.append({thing['name'] + "_" + thing['number']: scrape(thing['name'], thing['number'])})
 
     # while len(section_list) != len(result_list):
     #     for item in result_list:
     #         if item.ready():
     #             section_list.append(item.get())
+    # print section_list
+    gen_object.sections = section_list
+    gen_object.status['fetch'] = 'complete'
+    gen_object.save()
+
+    compile_schedules(gen_object.id)
 
     return
 
 
+@worker.task(name='tasks.compile_schedules')
+def compile_schedules(gen_id):
+    pass
+
+
 @worker.task(name='tasks.scrape')
-def scrape(classDept, classNumber, uuid):
+def scrape(class_dept, class_number):
+    driver = webdriver.Firefox()
     driver.get(
         'https://sis-portal-prod.uta.edu/psp/AEPPRD/EMPLOYEE/PSFT_ACS/c/COMMUNITY_ACCESS.CLASS_SEARCH.GBL?pslnkid=UTA_PS_CLASS_SCHEDULE_LINK&PORTALPARAM_PTCNAV=UTA_PS_CLASS_SCHEDULE&EOPP.SCNode=EMPL&EOPP.SCPortal=EMPLOYEE&EOPP.SCName=ADMN_CATALOGS_AND_CLASSES&EOPP.SCLabel=Catalogs%20and%20Classes&EOPP.SCPTcname=&FolderPath=PORTAL_ROOT_OBJECT.PORTAL_BASE_DATA.CO_NAVIGATION_COLLECTIONS.ADMN_CATALOGS_AND_CLASSES.ADMN_S200910131407282926114688&IsFolder=false')
     # sleep(5)
@@ -44,7 +61,7 @@ def scrape(classDept, classNumber, uuid):
             print type(e)
             print e
 
-    driver.find_element_by_name('SSR_CLSRCH_WRK_SUBJECT$0').send_keys(classDept)
+    driver.find_element_by_name('SSR_CLSRCH_WRK_SUBJECT$0').send_keys(class_dept)
 
     driver.find_element_by_name('SSR_CLSRCH_WRK_CATALOG_NBR$1').click()
     try:
@@ -53,11 +70,11 @@ def scrape(classDept, classNumber, uuid):
         print e
         print type(e)
     sleep(3)
-    driver.find_element_by_name('SSR_CLSRCH_WRK_CATALOG_NBR$1').send_keys(classNumber)
+    driver.find_element_by_name('SSR_CLSRCH_WRK_CATALOG_NBR$1').send_keys(class_number)
     driver.find_element_by_name('CLASS_SRCH_WRK2_SSR_PB_CLASS_SRCH').click()
     sleep(2)
     html = driver.execute_script("return document.getElementsByTagName('html')[0].innerHTML")
-    # driver.close()
+    driver.close()
 
     soup = BeautifulSoup(html, "html.parser")
     # print soup.prettify()
@@ -79,7 +96,8 @@ def scrape(classDept, classNumber, uuid):
             pass
 
     for section in section_list:
-
+        if section['unformatted_day_time'] == 'TBA':
+            continue
         process_array = section['unformatted_day_time'].split()
 
         # print process_array
@@ -144,10 +162,10 @@ def scrape(classDept, classNumber, uuid):
         section['start_time']['minute'] = f_start_time.minute
         section['start_time']['hour'] = f_start_time.hour
 
-        section['class_number'] = classNumber
-        section['department'] = classDept
+        section['class_number'] = class_number
+        section['department'] = class_dept
         section['repetition'] = repetition
-        section['uuid'] = uuid
+        # section['uuid'] = uuid
         # print section
 
     # print 'building objects'
@@ -155,7 +173,7 @@ def scrape(classDept, classNumber, uuid):
     #     print section
     r_list = list()
     for section in section_list:
-        if section is not None:
+        if section is not None and section.get('start_time'):
             try:
                 # print section
                 r_list.append(Section(**section).save().id)

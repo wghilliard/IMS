@@ -1,4 +1,5 @@
-from mongoengine import Document, StringField, DictField, DateTimeField, ListField, IntField, UUIDField
+from mongoengine import Document, StringField, DictField, DateTimeField, ListField, IntField, UUIDField, \
+    ObjectIdField, ReferenceField
 
 
 class Section(Document):
@@ -13,3 +14,17 @@ class Section(Document):
     end_time = DictField()
     repetition = DictField()
     uuid = UUIDField()
+
+
+class Generator(Document):
+    meta = {'collection': 'generators'}
+    owner = ObjectIdField()
+    classes = ListField(DictField())
+    tag_uuid = UUIDField()
+    sections = ListField(DictField())
+    block_outs = ListField(DictField())
+    status = DictField()
+    error = StringField()
+
+    def fetch_sections(self):
+        pass
