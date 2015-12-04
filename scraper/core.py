@@ -1,48 +1,99 @@
 from selenium import webdriver
 from bs4 import BeautifulSoup
 from time import sleep
-from models import Section, Generator
+from models import Section, Generator, Schedule, User
 import datetime
-import re
+import re, json, os
 from selenium.common.exceptions import NoSuchFrameException
 from uuid import uuid4
 from __init__ import worker
+from pymongo.errors import PyMongoError
 
 
 @worker.task(name='tasks.parse')
-def parse(gen_id):
+def parse(gen_id, loaded_data):
     gen_object = Generator.objects(pk=gen_id).first()
     section_list = list()
     class_list = gen_object.classes
-    # print class_list
-    # return
     for thing in class_list:
-        # print thing['name']
-        # print thing['number']
         section_objects = Section.objects(class_number=thing['number'], department=thing['name'])
-        print section_objects
+        # print section_objects
         if section_objects:
             section_list.append({thing['name'] + "_" + thing['number']: [section.id for section in section_objects]})
         else:
             section_list.append({thing['name'] + "_" + thing['number']: scrape(thing['name'], thing['number'])})
 
-    # while len(section_list) != len(result_list):
-    #     for item in result_list:
-    #         if item.ready():
-    #             section_list.append(item.get())
-    # print section_list
     gen_object.sections = section_list
     gen_object.status['fetch'] = 'complete'
     gen_object.save()
 
-    compile_schedules(gen_object.id)
-
+    compile_schedules(gen_object.id, loaded_data)
+    save_output(gen_object.id)
     return
 
 
+@worker.task(name='tasks.save_output')
+def save_output(gen_id):
+    with open('scheduler_final/tmp/out/{0}.JSON'.format(gen_id), 'r') as infile:
+        in_data = json.load(infile)
+
+    gen_object = Generator.objects(pk=gen_id).first()
+
+    sched_list = list()
+    try:
+        if in_data['status'] != 'complete':
+            gen_object.status['compile'] = in_data['status']
+            gen_object.error = in_data['error']
+        else:
+            for schedule in in_data['schedules']:
+                # print schedule
+                sched_id = Schedule(**schedule).save().id
+                sched_list.append(sched_id)
+            user = User.objects(pk=gen_object.owner).first()
+            user.schedules = user.schedules + sched_list
+            user.save()
+            gen_object.status['compile'] = 'complete'
+
+    except KeyError as e:
+        print e
+        gen_object.status['compile'] = 'failed'
+        gen_object.error = 'UKNOWN'
+
+    except PyMongoError as e:
+        gen_object.status['compile'] = 'failed'
+        gen_object.error = 'UKNOWN'
+
+        print e
+
+    finally:
+        gen_object.save()
+        # print sched_list
+
+
 @worker.task(name='tasks.compile_schedules')
-def compile_schedules(gen_id):
-    pass
+def compile_schedules(gen_id, data):
+    gen_object = Generator.objects(pk=gen_id).first()
+    full_classes = gen_object.sections
+
+    sections_dict = dict()
+    for course in full_classes:
+        for thing in course:
+            section_list = [Section.objects(pk=section).first().to_mongo().to_dict() for section in course[thing]]
+            for item in section_list:
+                item['_id'] = str(item['_id'])
+            sections_dict[thing] = section_list
+
+    data['sections'] = sections_dict
+    with open('scheduler_final/tmp/in/{0}.JSON'.format(gen_id), 'w') as outfile:
+        json.dump(data, outfile)
+
+    os.system("cd scheduler_final; java -cp json-simple-1.1.1.jar:. Scheduler " + str(gen_id) + ".JSON; cd ..")
+    return
+
+
+# @worker.task(name='tasks.compile_schedules')
+# def compile_schedules(gen_id):
+#     pass
 
 
 @worker.task(name='tasks.scrape')

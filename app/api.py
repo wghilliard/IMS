@@ -6,8 +6,10 @@ from mongoengine.errors import *
 from bson.objectid import ObjectId
 import json
 from werkzeug.exceptions import *
-from scraper.core import parse
-from matt_code.core import compile_schedules
+from scraper.core import parse, compile_schedules
+
+
+# from matt_code.core import compile_schedules
 # from app import app, db, lm
 
 
@@ -125,19 +127,34 @@ def delete_user():
 
 
 @app.route('/api/generate', methods=['POST', 'GET'])
-# @login_required
+@login_required
 def generate():
     if current_user:
 
         # Check status of schedule generation.
         if request.method == 'GET':
             try:
-                gen_id = session.get('gen_id')
-                if gen_id:
-                    gen_object = Generator.objects(pk=gen_id).first()
-                    return jsonify({'status': gen_object.status})
+                if session.get('gen_id'):
+                    print session['gen_id']
+                    gen_object = Generator.objects(pk=session['gen_id']).first()
+                    if gen_object.status['fetch'] != 'complete':
+                        return jsonify({'status': 'busy',
+                                        'action': 'fetching'})
+                    elif gen_object.status['compile'] == 'failed':
+                        session['gen_id'] = ''
+                        return jsonify({'status': 'failed',
+                                        'action': 'generate',
+                                        'error': gen_object.error})
+
+                    elif gen_object.status['compile'] == 'complete':
+
+                        return jsonify({'status': 'complete',
+                                        'action': 'generate',
+                                        'schedules': get_schedules()})
                 else:
-                    return jsonify({'test': 'false'})
+                    return jsonify({'status': 'not_started',
+                                    'action': 'get_generate'})
+
             # schedule_object = Schedule.objects(pk=gen_id).first()
 
             # return jsonify({'status': schedule_object.status,
@@ -149,23 +166,45 @@ def generate():
         elif request.method == 'POST':
             # print request.data
             if session.get('gen_id'):
-                gen_object = Generator.objects(pk=session['gen_id']).first()
-                if gen_object.status['fetch'] != 'complete' or gen_object.status['compile'] != 'complete':
-                    return jsonify({'status': 'aborted'})
+                return jsonify({'status': 'busy',
+                                'action': 'generate'})
             try:
                 loaded_data = json.loads(request.data)
                 gen_object = Generator(owner=current_user.id, classes=loaded_data['classes'],
                                        status={'fetch': 'started', 'compile': 'waiting'},
                                        block_outs=loaded_data['block_outs']).save()
                 session['gen_id'] = str(gen_object.id)
-                parse(gen_object.id)
-                compile_schedules(loaded_data, gen_object.id)
-                return jsonify({'status': 'started'})
+                parse(gen_object.id, loaded_data)
+                # compile_schedules(loaded_data, gen_object.id)
+                return jsonify({'status': 'started',
+                                'action': 'generate'})
             except Exception as e:
                 print e
                 raise BadRequest
-                # schedule_object = Schedule().save()
 
     else:
         print(request.method)
         return jsonify({'fuck': 'true'})
+
+
+@app.route('/api/schedules', methods=['GET'])
+@login_required
+def serve_schedules():
+    return jsonify({'status': 'complete',
+                    'action': 'serve_schedules',
+                    'schedules': get_schedules()})
+
+
+def get_schedules():
+    sched_list = User.objects(pk=current_user.id).first().schedules
+    # session['gen_id'] = ''
+    final_list = list()
+    for item in sched_list:
+        final_list.append(Schedule.objects(pk=item).first().to_mongo().to_dict())
+
+    for item in final_list:
+        # print item
+        item['_id'] = str(item['_id'])
+        item['sections'] = None
+    print final_list
+    return final_list
