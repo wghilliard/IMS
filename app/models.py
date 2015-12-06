@@ -67,7 +67,7 @@ class User(Document):
 
 class Section(Document):
     meta = {'collection': 'sections'}
-    class_number = StringField()
+    class_number = IntField()
     department = StringField()
     section_number = StringField(unique=True)
     room = StringField()

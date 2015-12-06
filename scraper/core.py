@@ -21,7 +21,14 @@ def parse(gen_id, loaded_data):
         if section_objects:
             section_list.append({thing['name'] + "_" + thing['number']: [section.id for section in section_objects]})
         else:
-            section_list.append({thing['name'] + "_" + thing['number']: scrape(thing['name'], thing['number'])})
+            holder = scrape(thing['name'], thing['number'])
+            # print holder
+            if len(holder) == 0:
+                gen_object.status['fetch'] = 'failed'
+                gen_object.error = "Could not fetch {0} {1}.".format(thing['name'], thing['number'])
+                gen_object.save()
+                return
+            section_list.append({thing['name'] + "_" + thing['number']: holder})
 
     gen_object.sections = section_list
     gen_object.status['fetch'] = 'complete'
@@ -36,6 +43,9 @@ def parse(gen_id, loaded_data):
 def save_output(gen_id):
     with open('scheduler_final/tmp/out/{0}.JSON'.format(gen_id), 'r') as infile:
         in_data = json.load(infile)
+
+    # os.remove('scheduler_final/tmp/out/{0}.JSON'.format(gen_id))
+    # os.remove('scheduler_final/tmp/in/{0}.JSON'.format(gen_id))
 
     gen_object = Generator.objects(pk=gen_id).first()
 
@@ -74,26 +84,47 @@ def save_output(gen_id):
 def compile_schedules(gen_id, data):
     gen_object = Generator.objects(pk=gen_id).first()
     full_classes = gen_object.sections
-
+    new_data = data_sans(data)
     sections_dict = dict()
     for course in full_classes:
         for thing in course:
             section_list = [Section.objects(pk=section).first().to_mongo().to_dict() for section in course[thing]]
             for item in section_list:
                 item['_id'] = str(item['_id'])
+
             sections_dict[thing] = section_list
 
-    data['sections'] = sections_dict
+    new_data['sections'] = sections_dict
     with open('scheduler_final/tmp/in/{0}.JSON'.format(gen_id), 'w') as outfile:
-        json.dump(data, outfile)
+        json.dump(new_data, outfile)
 
     os.system("cd scheduler_final; java -cp json-simple-1.1.1.jar:. Scheduler " + str(gen_id) + ".JSON; cd ..")
     return
 
 
-# @worker.task(name='tasks.compile_schedules')
-# def compile_schedules(gen_id):
-#     pass
+@worker.task(name='tasks.data_sans')
+def data_sans(data):
+    data['sleep'] = "{0}".format(data['sleep'])
+    # print data
+    for item in data['commute']:
+        data['commute'][item] = "{0}".format(data['commute'][item])
+    holder = data['block_outs']
+    out_list = list()
+    for block in holder:
+        # print "block ", block['sTime'][11:13]
+        # print "block2", block['sTime'][14:16]
+        block['start_time'] = {
+            "hour": "{0}".format(block['sTime'][11:13]),
+            "minute": "{0}".format(block['sTime'][14:16])
+        }
+        block['end_time'] = {
+            "hour": "{0}".format(block['eTime'][11:13]),
+            "minute": "{0}".format(block['eTime'][14:16])
+        }
+        out_list.append(block)
+    data['block_outs'] = out_list
+    # print "out", data
+    return data
 
 
 @worker.task(name='tasks.scrape')

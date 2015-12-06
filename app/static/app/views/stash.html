@@ -1,0 +1,134 @@
+<!--<div class="col-lg-6">-->
+          <!--&lt;!&ndash;Courses&ndash;&gt;-->
+          <!--</div>-->
+
+
+          <!--&lt;!&ndash;TODO: check times before adding&ndash;&gt;-->
+          <!--<h2 style="text-align: left; color: white">Block Outs</h2>-->
+
+          <!--<div style="float: left; color: white">-->
+          <!--<p>Instructions for how to make a block out.</p>-->
+          <!--</div>-->
+          <!--<br>-->
+          <!---->
+          <!--<div class="row col-lg-6">-->
+          <!--<div></div>-->
+          <!--</div>-->
+          <!---->
+          <!--<form class="form-horizontal">-->
+          <!--<div class="input-group input-group-sm">-->
+          <!--<input type="text" class="form-control" placeholder="Name" ng-model="model.block.name">-->
+          <!--<input type="text" class="form-control" placeholder="Location" ng-model="model.block.location">-->
+          <!--<input type="time" class="form-control" ng-model="model.block.sTime">-->
+          <!--<input type="time" class="form-control" ng-model="model.block.eTime">-->
+
+
+          <!--<div class="input-group-addon">-->
+
+
+          <!--<label class="day">-->
+          <!--<input type="checkbox" value="True" hidden ng-model="model.block.repetition.mon"><span>Monday</span>-->
+          <!--</label>-->
+          <!--<label class="day">-->
+          <!--<input type="checkbox" value="True" hidden ng-model="model.block.repetition.tues"><span>Tuesday</span>-->
+          <!--</label>-->
+
+          <!--<label class="day">-->
+          <!--<input type="checkbox" value="True" hidden-->
+          <!--ng-model="model.block.repetition.weds"><span>Wednesday</span>-->
+          <!--</label>-->
+          <!--<label class="day">-->
+          <!--<input type="checkbox" value="True" hidden-->
+          <!--ng-model="model.block.repetition.thurs"><span>Thursday</span>-->
+          <!--</label>-->
+          <!--<label class="day">-->
+          <!--<input type="checkbox" value="True" hidden ng-model="model.block.repetition.fri"><span>Friday</span>-->
+          <!--</label>-->
+          <!--<label class="day">-->
+          <!--<input type="checkbox" value="True" hidden ng-model="model.block.repetition.sat"><span>Saturday</span>-->
+          <!--</label>-->
+          <!--<label class="day">-->
+          <!--<input type="checkbox" value="True" hidden ng-model="model.block.repetition.sun"><span>Sunday</span>-->
+          <!--</label>-->
+          <!--<button class="btn-sm btn-default"-->
+          <!--ng-click="addBlock()"><span class="glyphicon glyphicon-plus"></span></button>-->
+          <!--</div>-->
+          <!--</div>-->
+          <!--</form>-->
+          <!--</div>-->
+          <!--<div class="row">-->
+          <!--&lt;!&ndash;Where added blocks go&ndash;&gt;-->
+          <!--<div ng-repeat="block in blocks track by $index">-->
+          <!--<input disabled type="text" ng-model="block.name">-->
+          <!--<input disabled type="text" ng-model="block.location">-->
+          <!--<input disabled type="time" ng-model="block.sTime">-->
+          <!--<input disabled type="time" ng-model="block.eTime">-->
+
+
+          <!--<label class="day" ng-show="block.repetition.mon != undefined">-->
+          <!--<input disabled hidden type="checkbox"> Monday-->
+          <!--</label>-->
+          <!--<label class="day" ng-show="block.repetition.tues != undefined">-->
+          <!--<input disabled hidden type="checkbox"> Tuesday-->
+          <!--</label>-->
+          <!--<label class="day" ng-show="block.repetition.weds != undefined">-->
+          <!--<input disabled hidden type="checkbox"> Wednesday-->
+          <!--</label>-->
+          <!--<label class="day" ng-show="block.repetition.thurs != undefined">-->
+          <!--<input disabled hidden type="checkbox"> Thursday-->
+          <!--</label>-->
+          <!--<label class="day" ng-show="block.repetition.fri != undefined">-->
+          <!--<input disabled hidden type="checkbox"> Friday-->
+          <!--</label>-->
+          <!--<label class="day" ng-show="block.repetition.sat != undefined">-->
+          <!--<input disabled hidden type="checkbox"> Saturday-->
+          <!--</label>-->
+          <!--<label class="day" ng-show="block.repetition.sun != undefined">-->
+          <!--<input disabled hidden type="checkbox"> Sunday-->
+          <!--</label>-->
+          <!--<button ng-click="removeBlock($index)"><span class="glyphicon glyphicon-remove"></span></button>-->
+          <!--</div>-->
+
+          <!--</div>-->
+          <!--<div class="row">-->
+          <!--<h2 style="color: white; text-align: left">Courses</h2>-->
+
+          <!--<div style="float: right; color: white">-->
+          <!--<p>Instructions for how to make a course.</p>-->
+          <!--</div>-->
+          <!--<input type="text" placeholder="Math" ng-model="model.course.name">-->
+          <!--<input type="text" placeholder="3330" ng-model="model.course.number">-->
+          <!--<button class="btn-sm btn-info" ng-click="addCourse()"><span class="glyphicon glyphicon-plus"></span>-->
+          <!--</button>-->
+
+          <!--<div ng-repeat="course in courses track by $index">-->
+          <!--<input disabled type="text" ng-model="course.name">-->
+          <!--<input disabled type="text" ng-model="course.number">-->
+          <!--<button ng-click="removeCourse($index)"><span class="glyphicon glyphicon-remove"></span></button>-->
+          <!--</div>-->
+
+          <!--</div>-->
+          <!--<div class="row">-->
+          <!--<h2 style="color: white; text-align: left">Stats</h2>-->
+
+          <!--<div style="float: right; color: white">-->
+          <!--<p>Instructions about stats n stuff.</p>-->
+          <!--</div>-->
+          <!--<h5>Desired of # of hours of sleep per night.</h5>-->
+          <!--<input type="number" ng-model="model.sleep" placeholder="6">-->
+          <!--<h5>Desired of # of hours of study per week.</h5> <h6 ng-show="model.rec_study != undefine">(Recommend:-->
+          <!--{{model.rec_study}})</h6>-->
+          <!--<input type="number" ng-model="model.study" placeholder="0">-->
+          <!--<h5>Time to work from home. (in minutes)</h5>-->
+          <!--<input type="number" ng-model="model.h2w" placeholder="0">-->
+          <!--<h5>Time to work from school. (in minutes)</h5>-->
+          <!--<input type="number" ng-model="model.s2w" placeholder="0">-->
+          <!--<h5>Time to school from home. (in minutes)</h5>-->
+          <!--<input type="number" ng-model="model.s2h" placeholder="0">-->
+          <!--</div>-->
+
+          <!--<div class="row" style="text-align: center">-->
+          <!--<button class="btn btn-default" ng-click="generateSchedule()">Generate Schedule-->
+          <!--</button>-->
+          <!--</div>-->
+          <!--<h3 ng-show="error != ''">{{error}}</h3>-->

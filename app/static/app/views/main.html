@@ -1,0 +1,314 @@
+<div class="container-fluid"
+     style="background-image: url('static/app/images/uta.jpg'); background-size: 100%;height: 100vh">
+    <div class="row">
+        <div class="col-lg-5">
+            <!--<img src="images/utalogo.png">-->
+            <h1 style="padding-left: 10px">Intelligent Maverick Scheduler</h1>
+        </div>
+        <div class="col-lg-7">
+            <h3 style="float: right" ng-click="user_modal()">{{username}}</h3>
+
+            <div class="my_group btn-group btn-group-sm" role="group" style="float: right">
+                <button class="my_nav meow btn btn-default" style="width: 120px">
+                    <h6><span class="glyphicon {{status}}"></span></h6>
+                </button>
+                <button class="my_nav meow btn btn-default" ng-click="set_stage(1)">
+                    <h5>Create</h5>
+                </button>
+                <button class="my_nav meow btn btn-default" ng-click="set_stage(2)">
+                    <h5>View</h5>
+                </button>
+                <button class="my_nav meow btn btn-default" ng-click="logout()">
+                    <h5>Logout</h5>
+                </button>
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div ng-show="stage == 1" style="text-align: center;" class="col-lg-9">
+            <h1 style=" color: white">Create Schedule</h1>
+
+            <div class="well-lg">
+                <div class="row" style="height: 50%">
+                    <!--Blockouts-->
+                    <h2 style="text-align: left; color: white">Block Outs</h2>
+
+                    <div class="row" style="width: 100%">
+                        <form class="form-inline">
+                            <div class="form-group form-group-sm">
+                                <label class="">Name</label>
+                                <select class="form-control" ng-model="model.block.name">
+                                    <option value="work">Work</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group form-group-sm">
+                                <label class=""> Location</label>
+                                <select class="form-control" ng-model="model.block.location">
+                                    <option value="work">Work</option>
+                                    <option value="school">School</option>
+                                    <option value="home">Home</option>
+                                </select>
+                            </div>
+                            <div class="form-group form-group-sm" style="width: 15%">
+                                <label class="">Start Time</label>
+                                <input type="time" value="06:00" class="form-control" style="width: 60%"
+                                       ng-model="model.block.sTime">
+                            </div>
+                            <div class=" form-group form-group-sm">
+                                <label class="">End Time</label>
+                                <input type="time" class="form-control" style="width: 64%" ng-model="model.block.eTime">
+                            </div>
+                            <!--<div class="form-group-sm">-->
+                            <div class="btn-group btn-group-sm">
+                                <label class="btn btn-default" ng-class="{test: model.block.repetition.mon == true }">
+                                    <input type="checkbox" value="True" hidden
+                                           ng-model="model.block.repetition.mon"><span>Monday</span>
+                                </label>
+                                <label class="btn btn-default " ng-class="{test: model.block.repetition.tues == true }">
+                                    <input type="checkbox" value="True" hidden
+                                           ng-model="model.block.repetition.tues"><span>Tuesday</span>
+                                </label>
+                                <label class="btn btn-default " ng-class="{test: model.block.repetition.weds == true }">
+                                    <input type="checkbox" value="True" hidden
+                                           ng-model="model.block.repetition.weds"><span>Wednesday</span>
+                                </label>
+                                <label class="btn btn-default "
+                                       ng-class="{test: model.block.repetition.thurs == true }">
+                                    <input type="checkbox" value="True" hidden
+                                           ng-model="model.block.repetition.thurs"><span>Thursday</span>
+                                </label>
+                                <label class="btn btn-default " ng-class="{test: model.block.repetition.fri == true }">
+                                    <input type="checkbox" value="True" hidden
+                                           ng-model="model.block.repetition.fri"><span>Friday</span>
+                                </label>
+                                <label class="btn btn-default " ng-class="{test: model.block.repetition.sat == true }">
+                                    <input type="checkbox" value="True" hidden
+                                           ng-model="model.block.repetition.sat"><span>Saturday</span>
+                                </label>
+                                <label class="btn btn-default " ng-class="{test: model.block.repetition.sun == true }">
+                                    <input type="checkbox" value="True" hidden
+                                           ng-model="model.block.repetition.sun"><span>Sunday</span>
+                                </label>
+                            </div>
+                            <label class="btn-sm btn-default"
+                                   ng-click="addBlock()"><span class="glyphicon glyphicon-plus"></span></label>
+                        </form>
+                    </div>
+                    <br>
+
+                    <div ng-repeat="block in blocks track by $index" class="row" style="width: 100%">
+                        <form class="form-inline col-lg-12">
+                            <div class="form-group form-group-sm ">
+                                <label class="">Type</label>
+                                <select class="form-control" ng-model="block.name">
+                                    <option value="work">Work</option>
+                                    <option value="work">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group form-group-sm">
+                                <label class="">Location</label>
+                                <select class="form-control" ng-model="block.location">
+                                    <option value="work">Work</option>
+                                    <option value="school">School</option>
+                                    <option value="home">Home</option>
+                                </select>
+                            </div>
+                            <div class="form-group form-group-sm" style="width:15%;">
+                                <label class="">Start Time</label>
+                                <input type="time" class="form-control" style="width: 60%;" ng-model="block.sTime">
+                            </div>
+                            <div class=" form-group form-group-sm">
+                                <label class="">End Time</label>
+                                <input type="time" class="form-control" style="width: 64%" ng-model="block.eTime">
+                            </div>
+                            <!--<div class="form-group-sm">-->
+                            <div class="btn-group btn-group-sm">
+                                <label class="btn btn-default" ng-class="{test: block.repetition.mon == true }">
+                                    <input type="checkbox" value="True" hidden ng-model="block.repetition.mon"><span>Monday</span>
+                                </label>
+                                <label class="btn btn-default " ng-class="{test: block.repetition.tues == true }">
+                                    <input type="checkbox" value="True" hidden ng-model="block.repetition.tues"><span>Tuesday</span>
+                                </label>
+                                <label class="btn btn-default " ng-class="{test: block.repetition.weds == true }">
+                                    <input type="checkbox" value="True" hidden
+                                           ng-model="block.repetition.weds"><span>Wednesday</span>
+                                </label>
+                                <label class="btn btn-default " ng-class="{test: block.repetition.thurs == true }">
+                                    <input type="checkbox" value="True" hidden
+                                           ng-model="block.repetition.thurs"><span>Thursday</span>
+                                </label>
+                                <label class="btn btn-default " ng-class="{test: block.repetition.fri == true }">
+                                    <input type="checkbox" value="True" hidden ng-model="block.repetition.fri"><span>Friday</span>
+                                </label>
+                                <label class="btn btn-default " ng-class="{test: block.repetition.sat == true }">
+                                    <input type="checkbox" value="True" hidden ng-model="block.repetition.sat"><span>Saturday</span>
+                                </label>
+                                <label class="btn btn-default " ng-class="{test: block.repetition.sun == true }">
+                                    <input type="checkbox" value="True" hidden ng-model="block.repetition.sun"><span>Sunday</span>
+                                </label>
+                            </div>
+                            <label class="btn-sm btn-default"
+                                   ng-click="removeBlock($index)"><span
+                                    class="glyphicon glyphicon-remove"></span></label>
+
+                        </form>
+                    </div>
+
+                    <h2 style="text-align: left; color: white">Classes</h2>
+
+                    <div class="row" style="width: 100%">
+                        <form class="form-inline col-lg-12">
+                            <div class="form-group form-group-sm">
+                                <label class="">Department</label>
+                                <input type="text" class="form-control" style="width: 30%" placeholder="GAINS"
+                                       ng-model="model.course.name">
+                            </div>
+                            <div class="form-group form-group-sm">
+                                <label class="">Number</label>
+                                <input type="text" class="form-control" style="width: 30%" placeholder="1337"
+                                       ng-model="model.course.number">
+                            </div>
+                            <label class="btn-sm btn-default" ng-click="addCourse()"><span
+                                    class="glyphicon glyphicon-plus"></span></label>
+                        </form>
+                    </div>
+
+                    <div ng-repeat="course in courses track by $index" class="row" style="width: 100%">
+                        <form class="form-inline col-lg-12">
+                            <div class="form-group form-group-sm ">
+                                <label class="">Department</label>
+                                <input type="text" class="form-control" placeholder="GAINS" style="width: 30%"
+                                       ng-model="course.name">
+                            </div>
+                            <div class="form-group form-group-sm">
+                                <label class="">Number</label>
+                                <input type="text" class="form-control" placeholder="1337" style="width: 30%"
+                                       ng-model="course.number">
+                            </div>
+                            <label class="btn-sm btn-default"
+                                   ng-click="removeCourse($index)"><span
+                                    class="glyphicon glyphicon-remove"></span></label>
+
+                        </form>
+                    </div>
+                    <h2 style="text-align: left; color: white">Stats</h2>
+                    <!--$scope.model.sleep, $scope.model.study, $scope.model.w2h, $scope.model.w2s, $scope.model.s2h-->
+                    <form class="form-inline col-lg-12">
+                        <div class="form-group form-group-sm">
+                            <label class=""><strong>Sleep</strong> (hours per night)</label>
+                            <input type="number" class="form-control" placeholder="6" ng-model="model.sleep">
+                        </div>
+                        <div class="form-group form-group-sm">
+                            <label class=""><strong>Study</strong> (hours per week, suggested {{courses.length * 3}})</label>
+                            <input required type="number" value="0" class="form-control"
+                                   placeholder=""
+                                   ng-model="model.study">
+                        </div>
+                        <div class="form-group form-group-sm">
+                            <label class=""><strong>Work <-> Home</strong> (minutes)</label>
+                            <input required type="number" value="0" class="form-control" placeholder="0"
+                                   ng-model="model.commute.workToHome">
+                        </div>
+                        <div class="form-group form-group-sm">
+                            <label class=""><strong>Work <-> School</strong> (minutes)</label>
+                            <input required type="number" value="0" class="form-control" placeholder="0"
+                                   ng-model="model.commute.workToSchool">
+                        </div>
+                        <div class="form-group form-group-sm">
+                            <label class=""><strong>Home <-> School</strong> (minutes)</label>
+                            <input required type="number" value="0" class="form-control" placeholder="0"
+                                   ng-model="model.commute.homeToSchool">
+                        </div>
+
+                    </form>
+
+                    <button class="btn btn-default my_nav meow" ng-click="generateSchedule()"
+                            style="margin-top: 30px"><h4>Generate</h4></button>
+                </div>
+            </div>
+        </div>
+        <div ng-show="stage == 2" style="text-align: center;" class="col-lg-9">
+            <!--schedule viewer-->
+            <h1>{{fetch.schedule.name}}</h1>
+
+            <div class="row well-lg">
+                <h1 ng-hide="fetch.schedule">No Schedule Selected!</h1>
+
+                <div class="col-lg-1" style="width: 12.5%; text-align: center"
+                     ng-repeat="day in fetch.schedule.days">
+                    <h4 style="color: white">{{day[0]| capitalize}}</h4>
+
+                    <div
+                            style="height: {{((block.end_time.hour - block.start_time.hour) * 60) + (block.end_time.minute
+               - block.start_time.minute) * .5}}px; min-height: {{cal_min_height(block.type)}}; width: 100%; background-color:
+               {{get_color(block.type)}};
+               color: white; margin-bottom: 5px;" ng-repeat="block in day[1]">
+                        <div style="height: inherit; padding-top: 5px; padding-bottom: 2px">
+                            <strong>{{block.start_time.hour}}:{{block.start_time.minute}} -
+                                {{block.end_time.hour}}:{{block.end_time.minute}}</strong><br>
+
+                            <div ng-hide="block.room">
+                                {{block.type | capitalize}} @ {{block.location | capitalize}}<br>
+                            </div>
+
+                            {{block.name}} {{block.section}}<br>
+
+                            {{block.room}}<br>
+                            {{block.instructor}}
+
+
+                        </div>
+
+
+                    </div>
+                </div>
+                <div class="col-lg-1" style="width: 12.5%; text-align: center;" ng-show="fetch.schedule">
+                    <h4 style="color: white">Options</h4>
+
+                    <div style="width: 100%" class="btn-group-vertical" role="group">
+                        <button class="btn btn-default">Validate<span></span></button>
+                        <button class="btn btn-warning" ng-click="deleteSchedule(fetch.schedule.id)">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-lg-3" style="display: block">
+            <h2 style="color: white; text-align: center">Notifications</h2>
+
+            <div class="well sideBoxes" style="margin-top: 20px;">
+                <!--Maybe use this for notifications instead? or even just split it?-->
+                <div class="alert alert-{{note.type}}" role="alert" style="margin-bottom: 10px; text-align: center"
+                     ng-repeat="note in notifications track by $index"><strong>{{note.type | capitalize}}!</strong>
+                    {{note
+                    .text}}
+                </div>
+            </div>
+            <h2 style="color: white; text-align: center">Schedules
+                <span class="badge">{{fetch.schedules.length | number}}</span></h2>
+
+            <div class="sideBoxes well" style="margin-bottom: 20px">
+                <h4 style="text-align: center" ng-show="fetch.schedules == undefined">No schedules to show.</h4>
+
+                <!--<div class="sidebarBoxes" style=""-->
+                <!--&gt;-->
+                <div class="alert alert-{{get_sched_color(sched.valid)}}" ng-click="set_sched($index)"
+                     style=" margin-bottom: 10px; text-align: center"
+                     ng-repeat="sched in fetch.schedules track by $index">
+                    <label style="float: right" class="btn-sm btn-default"
+                           ng-click="deleteSchedule(sched._id)"><span
+                            class="glyphicon glyphicon-remove"></span></label>
+                    <strong>{{sched.name}}</strong><br>
+                    {{sched.creation_date}}
+                </div>
+
+                    <span class="label label-default" style="margin: 2px"
+                          ng-repeat="class in sched.classes"> {{class}}</span>
+                <!--</div>-->
+            </div>
+        </div>
+    </div>
+</div>
