@@ -155,11 +155,12 @@ def generate():
                     # print session['gen_id']
                     gen_object = Generator.objects(pk=session['gen_id']).first()
                     if gen_object:
+                        print gen_object.status
                         if gen_object.status['fetch'] == 'started':
                             return jsonify({'status': 'busy',
                                             'action': 'fetching'})
 
-                        elif gen_object.status['fetch'] == 'failed':
+                        if gen_object.status['fetch'] == 'failed':
                             session['gen_id'] = ''
                             return jsonify({'status': 'failed',
                                             'action': 'fetching',
@@ -169,8 +170,12 @@ def generate():
                             return jsonify({'status': 'working',
                                             'action': 'generate'})
 
+                        # elif gen_object.status['compile'] == 'complete':
+                        #     return jsonify({'status': 'working',
+                        #                     'action': 'generate'})
+
                         elif gen_object.status['compile'] == 'failed':
-                            print "sending error"
+                            # print "sending error"
                             session['gen_id'] = ''
                             return jsonify({'status': 'failed',
                                             'action': 'generate',
@@ -180,11 +185,13 @@ def generate():
                             session['gen_id'] = ''
                             return jsonify({'status': 'complete',
                                             'action': 'generate',
-                                            'schedules': get_schedules()})
+                                            'stats': "There were {0} schedules created!".format(gen_object.count)
+                                            # 'schedules': get_schedules(),
+                                            })
                     else:
                         session['gen_id'] = ''
                         return jsonify({'status': 'not_started',
-                                        'action': 'get_generate'})
+                                        'action': 'generate'})
 
                 else:
                     return jsonify({'status': 'not_started',
@@ -206,13 +213,12 @@ def generate():
                                 'action': 'generate'})
             try:
                 loaded_data = json.loads(request.data)
-                print loaded_data
+                # print loaded_data
                 gen_object = Generator(owner=current_user.id, classes=loaded_data['classes'],
                                        status={'fetch': 'started', 'compile': 'waiting'},
                                        block_outs=loaded_data['block_outs']).save()
                 session['gen_id'] = str(gen_object.id)
                 parse.delay(gen_object.id, loaded_data)
-                # compile_schedules(loaded_data, gen_object.id)
                 return jsonify({'status': 'started',
                                 'action': 'generate'})
             except Exception as e:

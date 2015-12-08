@@ -13,7 +13,7 @@ angular.module('imsApp')
 
         var current_check = function () {
             landingService.who().then(function (data) {
-                console.log(data.username);
+                //console.log(data.username);
                 if (data.username !== 'anonymous') {
                     landingService.username = data.username;
                     $location.path("/main");

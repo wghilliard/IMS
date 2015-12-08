@@ -27,12 +27,12 @@ public class User {
     private ArrayList<Block> blockOuts = new ArrayList<Block>();
     private ArrayList<String> courses = new ArrayList<String>();
     private String notification;
-    
+
     public User(int workToHome, int workToSchool, int homeToSchool, int sleepHours, int sleepMinutes,
             int studyHours, int studyMinutes)
     {
         email="dogTeam";
-        password="yeah"; 
+        password="yeah";
         setWorkToSchool(workToSchool);
         setHomeToSchool(homeToSchool);
         setWorkToHome(workToHome);
@@ -125,7 +125,7 @@ public class User {
         }
         return true;
     }
-    
+
     public int getWorkToSchool() {
         return workToSchool;
     }
@@ -141,7 +141,7 @@ public class User {
     public String getNotification() {
         return notification;
     }
-    
+
     public boolean addCourse(String course)
     {
         for(int i =0; i<courses.size();i++)
@@ -157,12 +157,12 @@ public class User {
         setNotification("Course is successfully added.");
         return true;
     }
-    
+
     public ArrayList<String> getCourses()
     {
         return this.courses;
     }
-           
+
     public boolean addBlockOut(Block blockOut)
     {
         setNotification("");
@@ -181,7 +181,7 @@ public class User {
         setNotification("BlockOut was successfully added");
         return true;
     }
-    
+
     public void printCourses()
     {
         if(courses.size()==0)
@@ -195,7 +195,7 @@ public class User {
             System.out.println("\tCourse "+i+": "+courses.get(i));
         }
     }
-    
+
     public void printBlockOuts()
     {
         if(blockOuts.size()==0)
@@ -209,7 +209,7 @@ public class User {
             System.out.println("\tBlock " +i +": "+blockOuts.get(i));
         }
     }
-    
+
     public boolean setSections(ArrayList<ArrayList<Section>> sections)
     {
         if(sections.size() == courses.size())
@@ -223,18 +223,18 @@ public class User {
             return false;
         }
     }
-    
+
     public ArrayList<ArrayList<Section>> getSections()
     {
         return fetchedSections;
     }
-    
+
     public void printSections(ArrayList<ArrayList<Section>> sections)
     {
         Section section;
         System.out.println("Course chosen:");
         for(int i=0;i<sections.size();i++)
-        {                
+        {
             if(i>=courses.size())
                 break;
             System.out.println("\tCourse "+i+" ("+courses.get(i)+"): ");
@@ -245,7 +245,7 @@ public class User {
             }
         }
     }
-    
+
     public void printSchedules(ArrayList<ArrayList<Section>> schedules)
     {
         if(schedules == null || schedules.size()==0)
@@ -256,7 +256,7 @@ public class User {
         Section section;
         System.out.println("Schedules:");
         for(int i=0;i<schedules.size();i++)
-        {                
+        {
             System.out.println("\tSchedule "+i+":");
             for(int j=0;j<schedules.get(i).size();j++)
             {
@@ -266,7 +266,7 @@ public class User {
         }
         //System.out.println("yeah");
     }
-    
+
     public void printFinalSchedules(ArrayList<ArrayList<ArrayList<Block>>> schedules)
     {
         if(schedules == null || schedules.size()==0)
@@ -274,7 +274,7 @@ public class User {
         Block block;
         System.out.println("Schedules: ");
         for(int i=0;i<schedules.size();i++)
-        {                
+        {
             System.out.println("\tSchedule "+i+":");
             for(int j=0;j<schedules.get(i).size();j++)
             {
@@ -287,17 +287,17 @@ public class User {
             }
         }
     }
-    
+
     public ArrayList<ArrayList<ArrayList<Block>>> getFinalSchedules()
     {
         return schedules;
     }
-    
+
     public ArrayList<ArrayList<Section>> getSectionSchedules()
     {
         return sectionSchedules;
     }
-    
+
     public boolean setSectionIDs()
     {
         boolean valid = true;
@@ -314,15 +314,15 @@ public class User {
             sectionIdSchedules.add(new ArrayList<String>());
             for(j=0;j<sectionSchedules.get(i).size();j++)
                 sectionIdSchedules.get(i).add(sectionSchedules.get(i).get(j).getID());
-        }    
+        }
         return true;
     }
-    
+
     public ArrayList<ArrayList<String>> getSectionIDs()
     {
         return sectionIdSchedules;
     }
-    
+
     public void printSectionIDs()
     {
         if(sectionIdSchedules == null || sectionIdSchedules.size() == 0)
@@ -335,14 +335,14 @@ public class User {
                 System.out.println("\t\t"+sectionIdSchedules.get(i).get(j));
         }
     }
-    
+
     public ArrayList<Section> filter_sections1(ArrayList<Section> fetched_sections) // one course at a time
-    {   
+    {
         if(fetched_sections == null) // no sections
             return null;
-        
+
         ArrayList<Section> possSections = new ArrayList<Section>();
-        boolean valid; 
+        boolean valid;
         for(int i=0;i<fetched_sections.size();i++)
         {
             valid=true;
@@ -355,8 +355,8 @@ public class User {
         }
         return possSections;
     }
-    
-    
+
+
     public ArrayList<ArrayList<Section>> arrayProduct(ArrayList<ArrayList<Section>> possSections)
     {
         if(possSections == null || possSections.size()==0)
@@ -416,7 +416,7 @@ public class User {
                 }
             }
         }
-        
+
         for(int combinationNum=0;combinationNum<combinations.length;combinationNum++)
         {
             allCombinations.add(new ArrayList<Section>());
@@ -429,9 +429,9 @@ public class User {
         //printSchedules(allCombinations);
         return allCombinations;
     }
-    
+
     public ArrayList<ArrayList<Section>> filter_sections2(ArrayList<ArrayList<Section>> possSections)
-    {   
+    {
         if(possSections == null || possSections.size() == 0)
         {
             //System.out.println("what");
@@ -444,13 +444,13 @@ public class User {
                 //System.out.println("shit");
                 return null;
             }
-                
+
         }
         ArrayList<ArrayList<Section>> possibleSchedules = new ArrayList<ArrayList<Section>>();
         ArrayList<ArrayList<Section>> allCombinations = arrayProduct(possSections);
         /*if(allCombinations == null || allCombinations.size() == 0)
             return null;
-        
+
         for(int i=0;i<allCombinations.size();i++)
         {
             if(allCombinations.get(i) == null || allCombinations.get(i).size()==0)
@@ -473,9 +473,9 @@ public class User {
             if(valid)
                 possibleSchedules.add(allCombinations.get(comb));
         }
-        return possibleSchedules;  
+        return possibleSchedules;
     }
-    
+
     public void insertBlock(Block block, ArrayList<Block> schedule)
     {
         if(block==null || schedule ==null)
@@ -514,7 +514,7 @@ public class User {
             }
         }
     }
-    
+
     public ArrayList<ArrayList<ArrayList<Block>>> resembleSchedules(ArrayList<ArrayList<Section>> possibleSchedules)
     {
         ArrayList<ArrayList<ArrayList<Block>>> schedules = new ArrayList<ArrayList<ArrayList<Block>>>();
@@ -571,7 +571,7 @@ public class User {
                     {
                         //System.out.print("\t\t\tgot ");
                         insertBlock(blockOuts.get(i),schedules.get(j).get(k));
-                        
+
                        //System.out.println("it");
                     }
                 }
@@ -579,7 +579,7 @@ public class User {
         }
         return schedules;
     }
-    
+
     public int calcCommute(String location1, String location2)
     {
         if((location1.compareTo("home")==0 && location2.compareTo("school")==0) ||
@@ -594,7 +594,7 @@ public class User {
         else
             return -1;
     }
-    
+
     public Block makeCommuteTime(String location1, String location2, int dayNum, Time start)
     {
         int travel = calcCommute(location1,location2);
@@ -604,12 +604,14 @@ public class User {
             return null;
         DaysAvailable days = new DaysAvailable(false,false,false,false,false,false,false);
         days.setDay(true,dayNum);
-        String endLocation = new String(location2); 
+        String endLocation = new String(location2);
         return new Block("commute",endLocation,startTime,endTime, days);
     }
-    
+
     public Time addMinutes(Time time, int addMin)
     {
+        if(addMin==0 || time == null)
+            return null;
         int min = addMin%60;
         int hr = addMin/60 + time.getHours();
         min = min + time.getMinutes();
@@ -625,16 +627,16 @@ public class User {
         }
         return null;
     }
-    
+
     public Block makeStudyTime(Time time, int minutesAvailable, int day, String location)
     {
         if(time == null || minutesAvailable<=0 || (getStudyHours() == 0 && getStudyMinutes() ==0))
             return null;
-        
+
         DaysAvailable dayOn = new DaysAvailable(false,false,false,false,false,false,false);
         dayOn.setDay(true,day);
         Time newTime = new Time(time.getHours(), time.getMinutes());
-        
+
         int totalStudy = getStudyHours()*60 + getStudyMinutes();
         if(totalStudy>minutesAvailable)
         {
@@ -647,7 +649,7 @@ public class User {
         setStudyMinutes(0);
         return new Block("study",location,newTime,addMinutes(time,totalStudy),dayOn);
     }
-    
+
     public ArrayList<ArrayList<ArrayList<Block>>> insertCommuteTimes(ArrayList<ArrayList<ArrayList<Block>>> schedules)
     {
         Block block;
@@ -667,18 +669,21 @@ public class User {
                     //}
                     block = schedules.get(i).get(j).get(k);
                     Block commute;
-                    
+
                     if(k==schedules.get(i).get(j).size()-1)
                     {
                         //if(block.getLocation().compareTo("mobile")==0)
                             //block.setLocation("home");
                         if(block.getLocation().compareTo("home")!=0)
                         {
-                            commute = makeCommuteTime(block.getLocation(),"home",j, block.getEndTime());
-                            if(commute == null)
-                                valid = false;
+                            if(calcCommute(block.getLocation(),"home")<=block.getEndTime().minutesTo(new Time(0,0)))
+                            {
+                                commute = makeCommuteTime(block.getLocation(),"home",j, block.getEndTime());
+                                if(commute!=null)
+                                    schedules.get(i).get(j).add(k+1,commute);
+                            }
                             else
-                                schedules.get(i).get(j).add(k+1,commute);
+                                valid=false;
                         }
                     }
                     else
@@ -690,14 +695,17 @@ public class User {
                         {
                             if(block.getLocation().compareTo(nextBlock.getLocation())!=0)
                             {
-                                commute=makeCommuteTime(block.getLocation(),nextBlock.getLocation(),j,block.getEndTime());
-                                if(commute == null)
-                                    valid=false;
-                                else
+                                if(calcCommute(block.getLocation(),nextBlock.getLocation())<=block.getEndTime().minutesTo(new Time(0,0)))
                                 {
-                                    valid=nextBlock.checkNoConflicts(commute);
-                                    schedules.get(i).get(j).add(k+1,commute);
+                                    commute=makeCommuteTime(block.getLocation(),nextBlock.getLocation(),j,block.getEndTime());
+                                    if(commute != null)
+                                    {
+                                        valid=nextBlock.checkNoConflicts(commute);
+                                        schedules.get(i).get(j).add(k+1,commute);
+                                    }
                                 }
+                                else
+                                    valid=false;
                             }
                         }
                     }
@@ -713,7 +721,7 @@ public class User {
         }
         return schedules;
     }
-    
+
     /*public ArrayList<ArrayList<ArrayList<Block>>> insertCommuteTimes(ArrayList<ArrayList<ArrayList<Block>>> schedules)
     {
         Block block;
@@ -733,16 +741,16 @@ public class User {
                     if(block.getLocation().compareTo("home")!=0 ||
                             block.getLocation().compareTo("mobile")!=0)
                     {
-                        
+
                     }
                 }
-                
-                
+
+
                 for(int k=0;k<schedules.get(i).get(j).size() && valid;k++)
                 {
                     block = schedules.get(i).get(j).get(k);
                     Block commute;
-                    
+
                     if(k==schedules.get(i).get(j).size()-1)
                     {
                         if(location.compareTo("home")!=0)
@@ -784,7 +792,7 @@ public class User {
         }
         return schedules;
     }*/
-    
+
     public ArrayList<ArrayList<ArrayList<Block>>> insertStudyTimes(ArrayList<ArrayList<ArrayList<Block>>> schedules)
     {
         Block block;
@@ -822,9 +830,9 @@ public class User {
                             if(studyBlock!=null)
                             {
                                 schedules.get(i).get(j).add(studyBlock);
-                            }                           
+                            }
                         }
-                        
+
                     }
                     else if(k==schedules.get(i).get(j).size()-1)
                     {
@@ -867,7 +875,7 @@ public class User {
         }
         return schedules;
     }
-    
+
     public boolean generateSchedules()
     {
         boolean sleep = makeSleepBlock();
@@ -881,7 +889,7 @@ public class User {
             if(fetchedSections.size() == courses.size())
             {
                 ArrayList<ArrayList<Section>> possibleSections = new ArrayList<ArrayList<Section>>();
-        
+
                 for(int i = 0; i<fetchedSections.size();i++)
                 {
                     possibleSections.add(filter_sections1(fetchedSections.get(i)));
@@ -913,7 +921,7 @@ public class User {
                 return false;
             }
         }
-        
+
         this.sectionSchedules = possibleSchedules;
         ArrayList<ArrayList<ArrayList<Block>>> schedules = resembleSchedules(possibleSchedules);
         //System.out.println("\nAfter converting to schedule format");
@@ -926,7 +934,7 @@ public class User {
         }
         //System.out.println("\nAfter inserting commute times");
         //printFinalSchedules(schedules);
-        
+
         schedules=insertStudyTimes(schedules);
         if(schedules.size()==0 || schedules == null)
         {
@@ -942,12 +950,3 @@ public class User {
         return true;
     }
 }
-
-// I was thinking of type (in your case, name) having only two choices (slidebar or list to choose from)
-// types: work and other
-// for work, the location will be fixed as "work"
-// for other, location must be specified by one of these locations: work, school, home, mobile
-// for other, I also thought it should have an additional field for the name of that "other" block
-// is that possible?
-// ok
-// oh I forgot, we need some sort of way to designate what day the blockOut will be on

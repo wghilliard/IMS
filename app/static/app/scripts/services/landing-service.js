@@ -37,7 +37,7 @@ angular.module('imsApp')
                 data: $.param({'username': username, 'password': password}),
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'}
             }).then(function (response) {
-                console.log(response.data);
+                //console.log(response.data);
                 return response.data;
             });
             //this.username = username;
@@ -52,7 +52,7 @@ angular.module('imsApp')
                 data: $.param({'username': username, 'password': password}),
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'}
             }).then(function (response) {
-                console.log(response.data);
+                //console.log(response.data);
                 return response.data;
             });
             //this.username = username;

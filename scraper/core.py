@@ -62,6 +62,7 @@ def save_output(gen_id):
             user = User.objects(pk=gen_object.owner).first()
             user.schedules = user.schedules + sched_list
             user.save()
+            gen_object.count = len(sched_list)
             gen_object.status['compile'] = 'complete'
 
     except KeyError as e:

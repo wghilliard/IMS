@@ -88,6 +88,7 @@ class Generator(Document):
     block_outs = ListField(DictField())
     status = DictField()
     error = StringField()
+    count = IntField()
 
     def fetch_sections(self):
         pass

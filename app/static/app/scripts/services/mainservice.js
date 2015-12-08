@@ -33,8 +33,8 @@ angular.module('imsApp')
 
 
         this.check_status = function () {
-            return $http.get('/api/generate').then(function (reponse) {
-                return reponse.data;
+            return $http.get('/api/generate').then(function (response) {
+                return response.data;
             })
         };
 
